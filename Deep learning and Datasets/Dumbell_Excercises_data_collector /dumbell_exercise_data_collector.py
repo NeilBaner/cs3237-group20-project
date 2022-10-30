@@ -30,7 +30,7 @@ def addData():
     accel_y = float(accel_y_str) if accel_y_str else None
     accel_z = float(accel_z_str) if accel_z_str else None     
     resultant_g = float(resultant_g_str) if resultant_g_str else None
-    label = 'Idle'
+    label = 'Dumbbell-Squat'
     data_record = [gyro_x, gyro_y, gyro_z, accel_x, accel_y, accel_z, resultant_g, label]
 
     print("Gyroscope Data: x: {}, y: {}, z: {}\n".format(gyro_x, gyro_y, gyro_z))
