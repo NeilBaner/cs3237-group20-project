@@ -6,11 +6,11 @@
 #define MPU9250_ADDR 0x68
 
 //Wifi Information 
-const char* ssid = "Linksys07623"; // To fill out
+const char* ssid = ""; // To fill out
 const char* password = ""; // To fill out
 
 WiFiClient wifiClient;
-const char* laptopAt = "http://192.168.10.115:3237/"; //change to your Laptop's IP
+const char* laptopAt = "http://192.168.10.114:3237/"; //change to your Laptop's IP
 MPU9250_WE myMPU9250 = MPU9250_WE(MPU9250_ADDR);
 
 void setup(void){
@@ -118,5 +118,5 @@ void loop() {
   } else {
     Serial.println("WiFi disconnected");
   }
-  delay(1000);
+  delay(100); //Having a sampling rate of 10Hz
 }
