@@ -7,7 +7,7 @@
 
 //Wifi Information 
 const char* ssid = "Linksys07623"; // To fill out
-const char* password = "cktsd9gtdb"; // To fill out
+const char* password = ""; // To fill out
 
 WiFiClient wifiClient;
 const char* laptopAt = "http://192.168.10.115:3237/"; //change to your Laptop's IP
