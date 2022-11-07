@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Azure.Messaging.EventHubs;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System;
 
 namespace telemetry_receiver
 {
@@ -21,8 +22,8 @@ namespace telemetry_receiver
 
         public void populate(float[] ax, float[] ay, float[] az, float[] gx, float[] gy, float[] gz, float[] go)
         {
-            this.data = new float[10,7];
-            for(int i = 0; i < 10; ++i)
+            this.data = new float[10, 7];
+            for (int i = 0; i < 10; ++i)
             {
                 this.data[i, 0] = ax[i];
                 this.data[i, 1] = ay[i];
@@ -41,7 +42,7 @@ namespace telemetry_receiver
         static string predictorUrl = "http://ec2-52-77-242-91.ap-southeast-1.compute.amazonaws.com:80/predict";
         static string fallDetectorUrl = "http://ec2-54-169-87-226.ap-southeast-1.compute.amazonaws.com:80/predict";
         static string emergencyUrl = "https://api.telegram.org/bot5767852164:AAGjjY1I5_mUF4k-NAjeGrjV8irYvC1nPAQ/sendMessage?chat_id=-664384504&parse_mode=html&text=EMERGENCY!! Your loved one has fallen. <b>Please</b> check on them immediately. \n";
-
+        static string dbTableName = "[dbo].[exercise_table]";
 
         private static HttpClient client = new HttpClient();
 
@@ -53,27 +54,83 @@ namespace telemetry_receiver
             string[] messageStringTokens = messageString.Split('^');
             string sender = messageStringTokens[0];
             string[] dataStrings = messageStringTokens[1].Split(' ');
+            var sqlConnectionString = Environment.GetEnvironmentVariable("sqldb_connection");
 
             string predictionRequest = "";
 
-            if(sender == "dumbbell")
+            if (sender == "dumbbell")
             {
                 var response = client.PostAsJsonAsync(predictorUrl, "")
                     .GetAwaiter().GetResult();
                 string responseString = response.Content.ToString();
+                string category = "idle";
+                switch (responseString)
+                {
+                    case "1":
+                        category = "bicep_curl";
+                        break;
+                    case "2":
+                        category = "shoulder_press";
+                        break;
+                    case "3":
+                        category = "left_shoulder_lateral_raise";
+                        break;
+                    case "4":
+                        category = "right_shoulder_lateral_raise";
+                        break;
+                    case "5":
+                        category = "shoulder_front_raise";
+                        break;
+                    case "6":
+                        category = "left_hand_tricep_extension";
+                        break;
+                    case "7":
+                        category = "right_hand_tricep_extension";
+                        break;
+                    case "8":
+                        category = "forward_lunge";
+                        break;
+                    case "9":
+                        category = "dumbbell_squat";
+                        break;
+                    default:
+                        category = "idle";
+                        break;
+                }
+
+                string query = "UPDATE " + dbTableName + " SET [" + category + "] = [" + category + "] + 1"; 
+
+                using (SqlConnection conn = new SqlConnection(sqlConnectionString))
+                {
+                    conn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        // Execute the command and log the # rows affected.
+                        var rows = cmd.ExecuteNonQueryAsync().GetAwaiter().GetResult();
+                        log.LogInformation($"{rows} rows were updated");
+                    }
+                }
             }
             else
             {
-
+                var response = client.PostAsJsonAsync(fallDetectorUrl, "")
+                    .GetAwaiter().GetResult();
+                string responseString = response.Content.ToString();
+                if (responseString == "")
+                {
+                    var result = client.GetStringAsync(emergencyUrl)
+                .GetAwaiter().GetResult();
+                    log.LogInformation(result);
+                }
             }
 
             log.LogInformation($"C# IoT Hub trigger function processed a " +
                 $"message: {Encoding.UTF8.GetString(message.Body.ToArray())}");
 
-            var result = client.GetStringAsync(emergencyUrl)
-                .GetAwaiter().GetResult();
 
-            log.LogInformation(result);
+
+
         }
     }
 }

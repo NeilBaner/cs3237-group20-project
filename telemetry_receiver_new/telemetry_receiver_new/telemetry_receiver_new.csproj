@@ -8,13 +8,14 @@
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventHubs" Version="5.1.2" />
     <PackageReference Include="System.Threading.Tasks" Version="4.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.0.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.4" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Microsoft.Azure.WebJobs.Extensions.EventHubs" />
     <None Remove="System.Threading.Tasks" />
     <None Remove="Newtonsoft.Json" />
     <None Remove="Microsoft.Data.SqlClient" />
+    <None Remove="System.Data.SqlClient" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
