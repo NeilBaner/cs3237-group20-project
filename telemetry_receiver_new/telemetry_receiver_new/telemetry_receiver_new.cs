@@ -39,10 +39,12 @@ namespace telemetry_receiver
 
     public class telemetry_receiver
     {
-        static string predictorUrl = "http://ec2-52-77-242-91.ap-southeast-1.compute.amazonaws.com:80/predict";
-        static string fallDetectorUrl = "http://ec2-54-169-87-226.ap-southeast-1.compute.amazonaws.com:80/predict";
-        static string emergencyUrl = "https://api.telegram.org/bot5767852164:AAGjjY1I5_mUF4k-NAjeGrjV8irYvC1nPAQ/sendMessage?chat_id=-664384504&parse_mode=html&text=EMERGENCY!! Your loved one has fallen. <b>Please</b> check on them immediately. \n";
-        static string dbTableName = "[dbo].[exercise_table]";
+        private const string V = "dumbbell";
+        private const string predictorUrl = "http://ec2-52-77-242-91.ap-southeast-1.compute.amazonaws.com:80/predict";
+        private const string fallDetectorUrl = "http://ec2-54-169-87-226.ap-southeast-1.compute.amazonaws.com:80/predict";
+        private const string emergencyUrl = "https://api.telegram.org/bot5767852164:AAGjjY1I5_mUF4k-NAjeGrjV8irYvC1nPAQ/sendMessage?chat_id=-664384504&parse_mode=html&text=EMERGENCY!! Your loved one has fallen. <b>Please</b> check on them immediately. \n";
+        private const string dbTableName = "[dbo].[exercise_table]";
+        private const string fallResponseString = "";
 
         private static HttpClient client = new HttpClient();
 
@@ -54,15 +56,22 @@ namespace telemetry_receiver
             string[] messageStringTokens = messageString.Split('^');
             string sender = messageStringTokens[0];
             string[] dataStrings = messageStringTokens[1].Split(' ');
+
+            //TODO: parse the output of the wemos mqtt whatever
+            //TODO: make sure the output is formatted correctly
+
             var sqlConnectionString = Environment.GetEnvironmentVariable("sqldb_connection");
+
+            //TODO: build the POST request
 
             string predictionRequest = "";
 
-            if (sender == "dumbbell")
+            if (sender == V)
             {
                 var response = client.PostAsJsonAsync(predictorUrl, "")
                     .GetAwaiter().GetResult();
                 string responseString = response.Content.ToString();
+                //TODO: Make sure response is being read correctly
                 string category = "idle";
                 switch (responseString)
                 {
@@ -98,7 +107,7 @@ namespace telemetry_receiver
                         break;
                 }
 
-                string query = "UPDATE " + dbTableName + " SET [" + category + "] = [" + category + "] + 1"; 
+                string query = $"UPDATE {dbTableName} SET [{category}] = [{category}] + 1"; 
 
                 using (SqlConnection conn = new SqlConnection(sqlConnectionString))
                 {
@@ -117,7 +126,7 @@ namespace telemetry_receiver
                 var response = client.PostAsJsonAsync(fallDetectorUrl, "")
                     .GetAwaiter().GetResult();
                 string responseString = response.Content.ToString();
-                if (responseString == "")
+                if (responseString == fallResponseString)
                 {
                     var result = client.GetStringAsync(emergencyUrl)
                 .GetAwaiter().GetResult();
