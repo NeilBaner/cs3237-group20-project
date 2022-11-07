@@ -1,0 +1,36 @@
+﻿<Properties StartupConfiguration="{CCC72CA1-CD29-4193-B26A-8B72A9A3D8A7}|Default">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.ItemProperties.telemetry__receiver__new PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="telemetry_receiver_new/telemetry_receiver_new.cs">
+    <Files>
+      <File FileName="telemetry_receiver_new/telemetry_receiver_new.cs" Line="13" Column="32" />
+      <File FileName="telemetry_receiver_new/local.settings.json" Line="9" Column="1" />
+      <File FileName="telemetry_receiver_new/Properties/launchSettings.json" Line="1" Column="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="telemetry_receiver_new" expanded="True">
+            <Node name="telemetry_receiver_new" expanded="True">
+              <Node name="Dependencies" expanded="True">
+                <Node name="FrameworkReferences" expanded="True" />
+                <Node name="PackageDependencies" expanded="True" />
+              </Node>
+              <Node name="Properties" expanded="True">
+                <Node name="PublishProfiles" expanded="True" />
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
