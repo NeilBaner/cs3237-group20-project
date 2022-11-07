@@ -1,8 +1,9 @@
 typedef struct imu_data_t {
-    int acc_x;
-    int acc_y;
-    int acc_z;
-    int gyro_x;
-    int gyro_y;
-    int gyro_z;
+    float acc_x;
+    float acc_y;
+    float acc_z;
+    float gyro_x;
+    float gyro_y;
+    float gyro_z;
+    float resultantG
 };

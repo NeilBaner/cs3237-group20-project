@@ -86,6 +86,7 @@ static uint8_t telemetry_payload[100];
 static uint32_t telemetry_send_count = 0;
 
 imu_data_t imu_data[NUM_SAMPLES];
+int sample_counter = 0;
 MPU9250_WE imu = MPU9250_WE(MPU9250_ADDR);
 
 // Auxiliary functions
@@ -292,12 +293,50 @@ static void getTelemetryPayload(az_span payload, az_span* out_payload) {
     // payload = az_span_copy(
     //     payload, AZ_SPAN_FROM_STR("{ \"msgCount\": "));
     // (void)az_span_u32toa(payload, telemetry_send_count++, &payload);
-    payload = az_span_copy(
-        payload, AZ_SPAN_FROM_STR("dumbbell^"));
-    for (int i = 0; i < 70; ++i) {
+    payload = az_span_copy(payload, AZ_SPAN_FROM_STR("dumbbell^"));
+
+    //appending accel_x
+    for (int i = 0; i < 10; ++i) {
         (void)az_span_dtoa(payload, 69.0, 2, &payload);
-        payload = az_span_copy(payload, AZ_SPAN_FROM_STR(" "));
+        payload = az_span_copy(payload, AZ_SPAN_FROM_STR(imu_data[i].acc_x));
     }
+
+    //appending accel_y
+    for (int i = 0; i < 10; ++i) {
+        (void)az_span_dtoa(payload, 69.0, 2, &payload);
+        payload = az_span_copy(payload, AZ_SPAN_FROM_STR(imu_data[i].acc_y));
+    }
+
+    //appending accel_z
+    for (int i = 0; i < 10; ++i) {
+        (void)az_span_dtoa(payload, 69.0, 2, &payload);
+        payload = az_span_copy(payload, AZ_SPAN_FROM_STR(imu_data[i].acc_z));
+    }
+
+    //appending gyro_x
+    for (int i = 0; i < 10; ++i) {
+        (void)az_span_dtoa(payload, 69.0, 2, &payload);
+        payload = az_span_copy(payload, AZ_SPAN_FROM_STR(imu_data[i].gyro_x));
+    }
+
+    //appending gyro_y
+    for (int i = 0; i < 10; ++i) {
+        (void)az_span_dtoa(payload, 69.0, 2, &payload);
+        payload = az_span_copy(payload, AZ_SPAN_FROM_STR(imu_data[i].gyro_y));
+    }
+
+    //appending gyro_z
+    for (int i = 0; i < 10; ++i) {
+        (void)az_span_dtoa(payload, 69.0, 2, &payload);
+        payload = az_span_copy(payload, AZ_SPAN_FROM_STR(imu_data[i].gyro_z));
+    }
+
+    //appending resultantG
+    for (int i = 0; i < 10; ++i) {
+        (void)az_span_dtoa(payload, 69.0, 2, &payload);
+        payload = az_span_copy(payload, AZ_SPAN_FROM_STR(imu_data[i].resultantG));
+    }
+    
     payload = az_span_copy_u8(payload, '\0');
     *out_payload = az_span_slice(original_payload, 0, az_span_size(original_payload) - az_span_size(payload) - 1);
 }
@@ -356,8 +395,27 @@ void loop() {
         next_telemetry_send_time_ms = millis() + TELEMETRY_FREQUENCY_MILLISECS;
     }
 
-    if (millis() > next_telemetry_send_time_ms)
-
+    if (millis() > next_imu_poll_time_ms + 100) {
+        xyzFloat gValue = myMPU9250.getGValues();
+        xyzFloat gyr = myMPU9250.getGyrValues();
+        float resultantG = myMPU9250.getResultantG(gValue);
+        imu_data[sample_counter].acc_x = gValue.x;
+        imu_data[sample_counter].acc_y = gValue.y;
+        imu_data[sample_counter].acc_z = gValue.z;
+        imu_data[sample_counter].gyro_x = gyr.x;
+        imu_data[sample_counter].gyro_y = gyr.y;
+        imu_data[sample_counter].gyro_z = gyr.z;
+        imu_data[sample_counter].gyro_z = gyr.z;
+        imu_data[sample_counter].resultantG = resultantG;
+        
+        if(sample_counter == 10) {
+            sample_counter = 0;
+            next_imu_poll_time_ms = millis();
+            sendTelemetry();
+        } else {
+            sample_counter += 1;
+        }
+    }
     // MQTT loop must be called to process Device-to-Cloud and Cloud-to-Device.
     mqtt_client.loop();
     delay(500);

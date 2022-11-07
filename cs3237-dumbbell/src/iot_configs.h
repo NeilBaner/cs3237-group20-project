@@ -12,6 +12,6 @@
 
 // Publish 1 message every 2 seconds
 #define TELEMETRY_FREQUENCY_MILLISECS 2000
-#define NUM_SAMPLES 20
+#define NUM_SAMPLES 10
 
 #define BAUD_RATE 115200
