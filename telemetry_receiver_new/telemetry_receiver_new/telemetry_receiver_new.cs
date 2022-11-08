@@ -11,7 +11,6 @@ using System.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Azure.Messaging.EventHubs;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using System;
 
 namespace telemetry_receiver
@@ -39,14 +38,14 @@ namespace telemetry_receiver
 
     public class telemetry_receiver
     {
-        private const string V = "dumbbell";
+        private const string dumbbellString = "dumbbell";
         private const string predictorUrl = "http://ec2-52-77-242-91.ap-southeast-1.compute.amazonaws.com:80/predict";
         private const string fallDetectorUrl = "http://ec2-54-169-87-226.ap-southeast-1.compute.amazonaws.com:80/predict";
         private const string emergencyUrl = "https://api.telegram.org/bot5767852164:AAGjjY1I5_mUF4k-NAjeGrjV8irYvC1nPAQ/sendMessage?chat_id=-664384504&parse_mode=html&text=EMERGENCY!! Your loved one has fallen. <b>Please</b> check on them immediately. \n";
         private const string dbTableName = "[dbo].[exercise_table]";
-        private const string fallResponseString = "";
+        private const string fallResponseString = "fall";
 
-        private static HttpClient client = new HttpClient();
+        private static readonly HttpClient client = new HttpClient();
 
         [FunctionName("telemetry_receiver")]
         public static void Run([IoTHubTrigger("boydapp",
@@ -57,18 +56,18 @@ namespace telemetry_receiver
             string sender = messageStringTokens[0];
             string[] dataStrings = messageStringTokens[1].Split(' ');
 
-            //TODO: parse the output of the wemos mqtt whatever
+            
             //TODO: make sure the output is formatted correctly
 
             var sqlConnectionString = Environment.GetEnvironmentVariable("sqldb_connection");
 
             //TODO: build the POST request
 
-            string predictionRequest = "";
-
-            if (sender == V)
+            if (sender == dumbbellString)
             {
-                var response = client.PostAsJsonAsync(predictorUrl, "")
+                DumbbellData dumbbellData = new DumbbellData();
+                StringContent predictionRequest = new StringContent(JsonSerializer.Serialize(dumbbellData));
+                var response = client.PostAsync(predictorUrl, predictionRequest)
                     .GetAwaiter().GetResult();
                 string responseString = response.Content.ToString();
                 //TODO: Make sure response is being read correctly
@@ -136,10 +135,6 @@ namespace telemetry_receiver
 
             log.LogInformation($"C# IoT Hub trigger function processed a " +
                 $"message: {Encoding.UTF8.GetString(message.Body.ToArray())}");
-
-
-
-
         }
     }
 }
