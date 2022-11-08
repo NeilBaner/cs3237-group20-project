@@ -5,5 +5,5 @@ typedef struct imu_data_t {
     float gyro_x;
     float gyro_y;
     float gyro_z;
-    float resultantG
+    float resultantG;
 };
