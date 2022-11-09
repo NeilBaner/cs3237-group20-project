@@ -23,6 +23,7 @@ namespace telemetry_receiver
         {
             this.data = new float[10, 7];
             for (int i = 0; i < 10; ++i)
+
             {
                 this.data[i, 0] = ax[i];
                 this.data[i, 1] = ay[i];
@@ -38,6 +39,7 @@ namespace telemetry_receiver
 
     public class telemetry_receiver
     {
+
         private const string dumbbellString = "dumbbell";
         private const string predictorUrl = "http://ec2-52-77-242-91.ap-southeast-1.compute.amazonaws.com:80/predict";
         private const string fallDetectorUrl = "http://ec2-54-169-87-226.ap-southeast-1.compute.amazonaws.com:80/predict";
@@ -135,6 +137,7 @@ namespace telemetry_receiver
 
             log.LogInformation($"C# IoT Hub trigger function processed a " +
                 $"message: {Encoding.UTF8.GetString(message.Body.ToArray())}");
+
         }
     }
 }

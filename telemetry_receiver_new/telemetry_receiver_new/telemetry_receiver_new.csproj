@@ -13,7 +13,7 @@
     <None Remove="Microsoft.Azure.WebJobs.Extensions.EventHubs" />
     <None Remove="System.Threading.Tasks" />
     <None Remove="Newtonsoft.Json" />
-    <None Remove="Microsoft.Data.SqlClient" />
+    <None Remove="Microsoft.Data.SqlClient" />\
     <None Remove="System.Data.SqlClient" />
   </ItemGroup>
   <ItemGroup>

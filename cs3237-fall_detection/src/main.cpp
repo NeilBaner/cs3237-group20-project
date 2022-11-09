@@ -61,6 +61,9 @@
 #define ONE_HOUR_IN_SECS 3600
 #define NTP_SERVERS "pool.ntp.org", "time.nist.gov"
 #define MQTT_PACKET_SIZE 1024
+#define BUZZER D3
+#define LED D4
+#define BUTTON D5
 
 // Translate iot_configs.h defines into variables used by the sample
 static const char* ssid = IOT_CONFIG_WIFI_SSID;
@@ -82,14 +85,23 @@ static char base64_decoded_device_key[32];
 static unsigned long next_telemetry_send_time_ms = 0;
 static unsigned long next_imu_poll_time_ms = 0;
 static char telemetry_topic[128];
-
 static uint8_t telemetry_payload[1000];
 static uint32_t telemetry_send_count = 0;
 
-imu_data_t imu_data[NUM_SAMPLES];
+imu_data_t imu_data;
 int sample_counter = 0;
 MPU9250_WE imu = MPU9250_WE(MPU9250_ADDR);
-
+volatile byte state = LOW;
+volatile int last_interrupt_time = 0;
+//Interrupt Defintion
+IRAM_ATTR void toggle() {
+  unsigned long interrupt_time = millis(); // milis() Returns the number of milliseconds passed since the Arduino board began running the current program. 
+  if (interrupt_time - last_interrupt_time > 200){
+    Serial.print("button pressed!");
+    state = LOW;
+    last_interrupt_time = interrupt_time;
+  }
+}
 // Auxiliary functions
 
 static void connectToWiFi() {
@@ -294,55 +306,32 @@ static void getTelemetryPayload(az_span payload, az_span* out_payload) {
     // payload = az_span_copy(
     //     payload, AZ_SPAN_FROM_STR("{ \"msgCount\": "));
     // (void)az_span_u32toa(payload, telemetry_send_count++, &payload);
-    payload = az_span_copy(payload, AZ_SPAN_FROM_STR("dumbbell^"));
+    payload = az_span_copy(payload, AZ_SPAN_FROM_STR("wristband^"));
 
     //appending accel_x
-    for (int i = 0; i < NUM_SAMPLES; ++i) {
-        (void)az_span_dtoa(payload, imu_data[i].acc_x, 2, &payload);
-        payload = az_span_copy(payload, AZ_SPAN_FROM_STR(" "));
-    }
 
-    //appending accel_y
-    for (int i = 0; i < NUM_SAMPLES; ++i) {
-        (void)az_span_dtoa(payload, imu_data[i].acc_y, 2, &payload);
-        payload = az_span_copy(payload, AZ_SPAN_FROM_STR(" "));
-    }
+    (void)az_span_dtoa(payload, imu_data.acc_x, 2, &payload);
+    payload = az_span_copy(payload, AZ_SPAN_FROM_STR(" "));
+    (void)az_span_dtoa(payload, imu_data.acc_y, 2, &payload);
+    payload = az_span_copy(payload, AZ_SPAN_FROM_STR(" "));
+    (void)az_span_dtoa(payload, imu_data.acc_z, 2, &payload);
+    payload = az_span_copy(payload, AZ_SPAN_FROM_STR(" "));
+    (void)az_span_dtoa(payload, imu_data.gyro_x, 2, &payload);
+    payload = az_span_copy(payload, AZ_SPAN_FROM_STR(" "));
+    (void)az_span_dtoa(payload, imu_data.gyro_y, 2, &payload);
+    payload = az_span_copy(payload, AZ_SPAN_FROM_STR(" "));
+    (void)az_span_dtoa(payload, imu_data.gyro_z, 2, &payload);
+    payload = az_span_copy(payload, AZ_SPAN_FROM_STR(" "));
+    (void)az_span_dtoa(payload, imu_data.resultantG, 2, &payload);
+    payload = az_span_copy(payload, AZ_SPAN_FROM_STR(" "));
 
-    //appending accel_z
-    for (int i = 0; i < NUM_SAMPLES; ++i) {
-        (void)az_span_dtoa(payload, imu_data[i].acc_z, 2, &payload);
-        payload = az_span_copy(payload, AZ_SPAN_FROM_STR(" "));
-    }
-
-    //appending gyro_x
-    for (int i = 0; i < 10; ++i) {
-        (void)az_span_dtoa(payload, imu_data[i].gyro_x, 2, &payload);
-        payload = az_span_copy(payload, AZ_SPAN_FROM_STR(" "));
-    }
-
-    //appending gyro_y
-    for (int i = 0; i < NUM_SAMPLES; ++i) {
-        (void)az_span_dtoa(payload, imu_data[i].gyro_y, 2, &payload);
-        payload = az_span_copy(payload, AZ_SPAN_FROM_STR(" "));
-    }
-
-    //appending gyro_z
-    for (int i = 0; i < NUM_SAMPLES; ++i) {
-        (void)az_span_dtoa(payload, imu_data[i].gyro_z, 2, &payload);
-        payload = az_span_copy(payload, AZ_SPAN_FROM_STR(" "));
-    }
-
-    //appending resultantG
-    for (int i = 0; i < NUM_SAMPLES; ++i) {
-        (void)az_span_dtoa(payload, imu_data[i].resultantG, 2, &payload);
-        payload = az_span_copy(payload, AZ_SPAN_FROM_STR(" "));
-    }
 
     payload = az_span_copy_u8(payload, '\0');
     *out_payload = az_span_slice(original_payload, 0, az_span_size(original_payload) - az_span_size(payload) - 1);
 }
 
 static void sendTelemetry() {
+    Serial.println("Error from sendTelemetry");
     az_span telemetry = AZ_SPAN_FROM_BUFFER(telemetry_payload);
 
     // The topic could be obtained just once during setup,
@@ -381,7 +370,6 @@ void setup() {
     pinMode(LED_PIN, OUTPUT);
     digitalWrite(LED_PIN, HIGH);
     establishConnection();
-
     Wire.begin();
     if(!imu.init()){
         Serial.println("MPU9250 does not respond");
@@ -407,44 +395,62 @@ void setup() {
     imu.enableAccDLPF(true);
     imu.setAccDLPF(MPU9250_DLPF_6);
 
+    //Setting up Actuators
+    pinMode(BUZZER, OUTPUT); // Set buzzer - pin 9 as an output
+    pinMode(LED, OUTPUT);
+    //  pinMode(BUTTON, INPUT);
+    pinMode(BUTTON, INPUT_PULLUP);
+    attachInterrupt(
+    digitalPinToInterrupt(BUTTON),
+    toggle,
+    CHANGE 
+    );
 }
 
 void my_telemetry() {
 }
 
 void loop() {
-    if (millis() > next_telemetry_send_time_ms) {
-        // Check if connected, reconnect if needed.
-        if (!mqtt_client.connected()) {
-            establishConnection();
-        }
+    // if (millis() > next_telemetry_send_time_ms) {
+    //     // Check if connected, reconnect if needed.
+    //     if (!mqtt_client.connected()) {
+    //         establishConnection();
+    //     }
+    //     sendTelemetry();
+    //     next_telemetry_send_time_ms = millis() + TELEMETRY_FREQUENCY_MILLISECS;
+    // }
+
+    xyzFloat gValue = imu.getGValues();
+    xyzFloat gyr = imu.getGyrValues();
+    float resultantG = imu.getResultantG(gValue);
+    
+    if (!mqtt_client.connected()) {
+        establishConnection();
+    }
+
+        imu_data.acc_x = gValue.x;
+        imu_data.acc_y = gValue.y;
+        imu_data.acc_z = gValue.z;
+        imu_data.gyro_x = gyr.x;
+        imu_data.gyro_y = gyr.y;
+        imu_data.gyro_z = gyr.z;
+        imu_data.gyro_z = gyr.z;
+        imu_data.resultantG = resultantG;
+     
+        Serial.println(resultantG);
+    if (resultantG > 2) {
+        state = HIGH;
         sendTelemetry();
-        next_telemetry_send_time_ms = millis() + TELEMETRY_FREQUENCY_MILLISECS;
     }
 
+    if(state){
+      tone(BUZZER, 1000); // Send 1KHz sound signal...
+      digitalWrite(LED, HIGH);
+      delay(50);        // ...for 1 sec
+      noTone(BUZZER);     // Stop sound...
+      digitalWrite(LED, LOW);
+      delay(50);        // ...for 1sec
+    } 
 
-    if (millis() > next_imu_poll_time_ms + 100) {
-        xyzFloat gValue = imu.getGValues();
-        xyzFloat gyr = imu.getGyrValues();
-        float resultantG = imu.getResultantG(gValue);
-        imu_data[sample_counter].acc_x = gValue.x;
-        imu_data[sample_counter].acc_y = gValue.y;
-        imu_data[sample_counter].acc_z = gValue.z;
-        imu_data[sample_counter].gyro_x = gyr.x;
-        imu_data[sample_counter].gyro_y = gyr.y;
-        imu_data[sample_counter].gyro_z = gyr.z;
-        imu_data[sample_counter].gyro_z = gyr.z;
-        imu_data[sample_counter].resultantG = resultantG;
-        
-        if(sample_counter == 10) {
-            sample_counter = 0;
-            next_imu_poll_time_ms = millis();
-            // sendTelemetry();
-        } else {
-            sample_counter += 1;
-        }
-    }
-    // MQTT loop must be called to process Device-to-Cloud and Cloud-to-Device.
     mqtt_client.loop();
-
 }
