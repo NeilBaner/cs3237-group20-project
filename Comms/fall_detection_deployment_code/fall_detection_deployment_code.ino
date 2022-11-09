@@ -3,19 +3,32 @@
 #include <WiFiClient.h>
 #include <MPU9250_WE.h>
 #include <Wire.h>
+
 #define MPU9250_ADDR 0x68
+#define BUZZER D3
+#define LED D4
+#define BUTTON D5
 
 //Wifi Information 
-const char* ssid = "Shreyas-Wifi"; // To fill out
-const char* password = "8alpha0208912677298las"; // To fill out
+const char* ssid = ""; // To fill out
+const char* password = ""; // To fill out
 
-WiFiClient wifiClient;
-const char* laptopAt = "http://192.168.10.114:3237/"; //change to your Laptop's IP
+const char* serverAt = "http://192.168.24.118:3237/"; //change to your Laptop's IP
 MPU9250_WE myMPU9250 = MPU9250_WE(MPU9250_ADDR);
 
-void setup(void){
+WiFiClient wifiClient;
+volatile byte state = LOW;
+volatile int last_interrupt_time = 0;
 
-  //Setting up Wifi Connection for WeMos
+IRAM_ATTR void toggle() {
+  unsigned long interrupt_time = millis(); // milis() Returns the number of milliseconds passed since the Arduino board began running the current program. 
+  if (interrupt_time - last_interrupt_time > 200){
+    state = ! state;
+    last_interrupt_time = interrupt_time;
+  }
+}
+
+void setup(){
   Serial.begin(115200);
   WiFi.begin(ssid, password);
   Serial.println("");
@@ -66,31 +79,29 @@ void setup(void){
   //Enabling Axes for accelorometer and gyroscope measurements
   myMPU9250.setMagOpMode(AK8963_CONT_MODE_100HZ);
   delay(200);
-  
+
+  //Setting up Actuators
+  pinMode(BUZZER, OUTPUT); // Set buzzer - pin 9 as an output
+  pinMode(LED, OUTPUT);
+  pinMode(BUTTON, INPUT_PULLUP);
+  attachInterrupt(
+   digitalPinToInterrupt(BUTTON),
+   toggle,
+   CHANGE 
+  );
 }
 
-void loop() {
-  // put your main code here, to run repeatedly
+void loop(){
 
-  Serial.print("Sending...");
   if (WiFi.status() == WL_CONNECTED){
     HTTPClient http;
-
     xyzFloat gValue = myMPU9250.getGValues();
     xyzFloat gyr = myMPU9250.getGyrValues();
     xyzFloat magValue = myMPU9250.getMagValues();
     float temp = myMPU9250.getTemperature();
     float resultantG = myMPU9250.getResultantG(gValue);
-  
-    //Printing Accelorometer data
-    Serial.print(gValue.x);
-    Serial.print(",");
-    Serial.print(gValue.y);
-    Serial.print(",");
-    Serial.print(gValue.z);
-    Serial.println("");
-    String url = laptopAt;
-    url += "data?gyro_x=";
+    String url = serverAt;
+        url += "data?gyro_x=";
     url += gyr.x;
     url +="&gyro_y="; 
     url += gyr.y;
@@ -104,19 +115,27 @@ void loop() {
     url += gValue.z;
     url +="&resultantG="; 
     url += resultantG;    
-    //hardcoded values for example only
-    
+  
     http.begin(wifiClient,url);
+
+    //TODO: perform get request only if value if the resulatant gvalue is above 1.3
     int returnCode = http.GET();   //perform a HTTP GET request
     
     if (returnCode > 0){
       String payload = http.getString();
       Serial.println(payload);
     }
+    /**
+     TODO: Code over here is used to update the sat
+    **/
     http.end();
-    
-  } else {
-    Serial.println("WiFi disconnected");
+    if(state){
+      tone(BUZZER, 1000); // Send 1KHz sound signal...
+      digitalWrite(LED, HIGH);
+      delay(100);        // ...for 1 sec
+      noTone(BUZZER);     // Stop sound...
+      digitalWrite(LED, LOW);
+      delay(100);        // ...for 1sec
+    } 
   }
-  delay(100); //Having a sampling rate of 10Hz
 }
