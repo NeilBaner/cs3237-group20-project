@@ -82,6 +82,7 @@ static char base64_decoded_device_key[32];
 static unsigned long next_telemetry_send_time_ms = 0;
 static unsigned long next_imu_poll_time_ms = 0;
 static char telemetry_topic[128];
+
 static uint8_t telemetry_payload[1000];
 static uint32_t telemetry_send_count = 0;
 
@@ -342,7 +343,6 @@ static void getTelemetryPayload(az_span payload, az_span* out_payload) {
 }
 
 static void sendTelemetry() {
-    Serial.println("Error from sendTelemetry");
     az_span telemetry = AZ_SPAN_FROM_BUFFER(telemetry_payload);
 
     // The topic could be obtained just once during setup,
@@ -381,6 +381,7 @@ void setup() {
     pinMode(LED_PIN, OUTPUT);
     digitalWrite(LED_PIN, HIGH);
     establishConnection();
+
     Wire.begin();
     if(!imu.init()){
         Serial.println("MPU9250 does not respond");
@@ -405,6 +406,7 @@ void setup() {
     imu.setAccRange(MPU9250_ACC_RANGE_2G);
     imu.enableAccDLPF(true);
     imu.setAccDLPF(MPU9250_DLPF_6);
+
 }
 
 void my_telemetry() {
@@ -419,6 +421,7 @@ void loop() {
         sendTelemetry();
         next_telemetry_send_time_ms = millis() + TELEMETRY_FREQUENCY_MILLISECS;
     }
+
 
     if (millis() > next_imu_poll_time_ms + 100) {
         xyzFloat gValue = imu.getGValues();
@@ -443,4 +446,5 @@ void loop() {
     }
     // MQTT loop must be called to process Device-to-Cloud and Cloud-to-Device.
     mqtt_client.loop();
+
 }
