@@ -1,0 +1,82 @@
+.App {
+  text-align: center;
+  font-family: 'Roboto', cursive;
+  background-color: #a7bea3;
+  min-height: 100vh;
+  height: 100%;
+}
+
+.App-logo {
+  height: 5vmin;
+  pointer-events: none;
+}
+
+.App-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; 
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  padding: 3vw;
+}
+
+.info-card {
+  text-align: left;
+  color: black;
+  background-color: white;
+  min-width: 30vw;
+  border-radius: 20px;
+  padding: 50px;
+  display: flex;
+  justify-content: center;
+}
+
+.info-card p {
+  font-size: 18px;
+}
+
+.display-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.table span {
+  font-size: 30px;
+}
+
+.table tr {
+  font-size: 20px;
+}
+
+button {
+  font-size: 20px;
+  outline: none;
+  border: none;
+  padding: 1vh 1vw;
+  border-radius: 20px;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+  cursor: pointer;
+  transform: translateY(-7px);
+  box-shadow: 0px 2px 8px rgba(90, 173, 104, 0.1)
+}
+
+.corner {
+  float: right
+}
