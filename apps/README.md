@@ -12,7 +12,7 @@ Intially running on heroku, but it could not work well with the Azure Database. 
 
 ### API endpoint for fall detection
 this sends the message to me @franceneee
-- (https://api.telegram.org/bot5767852164:AAGjjY1I5_mUF4k-NAjeGrjV8irYvC1nPAQ/sendMessage?chat_id=615729062&text=EMERGENCY!! Your loved one has fallen. <b>Please</b> check on them immediately.)[https://api.telegram.org/bot5767852164:AAGjjY1I5_mUF4k-NAjeGrjV8irYvC1nPAQ/sendMessage?chat_id=615729062&text=EMERGENCY!! Your loved one has fallen. <b>Please</b> check on them immediately.]
+- `https://api.telegram.org/bot5767852164:AAGjjY1I5_mUF4k-NAjeGrjV8irYvC1nPAQ/sendMessage?chat_id=615729062&text=EMERGENCY!! Your loved one has fallen. <b>Please</b> check on them immediately.`
 
 
 # PWA website
