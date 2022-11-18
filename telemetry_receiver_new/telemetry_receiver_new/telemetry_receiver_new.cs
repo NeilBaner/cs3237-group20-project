@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-﻿using IoTHubTrigger = Microsoft.Azure.WebJobs.EventHubTriggerAttribute;
+using IoTHubTrigger = Microsoft.Azure.WebJobs.EventHubTriggerAttribute;
 
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
@@ -373,4 +372,3 @@ namespace telemetry_receiver
         }
     }
 }
->>>>>>> 89f0d2d (final)
