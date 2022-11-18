@@ -1,0 +1,10 @@
+FROM python:3.6-slim
+COPY ./app-lstm.py /deploy/
+COPY ./requirements.txt /deploy/
+
+COPY ./lstm.hd5/ /deploy/lstm.hd5
+WORKDIR /deploy/
+RUN python -m pip install --upgrade pip 
+RUN pip install -r requirements.txt
+EXPOSE 80
+ENTRYPOINT ["python", "app-lstm.py"]

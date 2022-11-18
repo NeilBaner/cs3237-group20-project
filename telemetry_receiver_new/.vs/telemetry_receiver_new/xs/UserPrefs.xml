@@ -1,10 +1,10 @@
 ﻿<Properties StartupConfiguration="{CCC72CA1-CD29-4193-B26A-8B72A9A3D8A7}|Default">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MultiItemStartupConfigurations />
-  <MonoDevelop.Ide.ItemProperties.telemetry__receiver__new PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.Workbench ActiveDocument="telemetry_receiver_new/telemetry_receiver_new.cs">
     <Files>
-      <File FileName="telemetry_receiver_new/telemetry_receiver_new.cs" Line="13" Column="32" />
+      <File FileName="telemetry_receiver_new/telemetry_receiver_new.cs" Line="76" Column="35" />
       <File FileName="telemetry_receiver_new/local.settings.json" Line="9" Column="1" />
       <File FileName="telemetry_receiver_new/Properties/launchSettings.json" Line="1" Column="1" />
     </Files>
@@ -29,8 +29,8 @@
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.ItemProperties.telemetry__receiver__new PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>
