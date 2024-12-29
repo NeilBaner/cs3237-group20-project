@@ -44,6 +44,8 @@ BOYD leverages a cloud-based architecture:
 - **Dumbbell**:
   - Components: IMU sensor, WeMos microcontroller, power supply.
   - Usage: Exercise Tracking
+
+- The following figure showcases the design of the wristband and the sensor mounted dumbell:
 ![Hardware Design Diagram](./image_assets/hardware_design.png)
 
 ---
