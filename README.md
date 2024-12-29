@@ -50,24 +50,24 @@ BOYD leverages a cloud-based architecture:
 
 ---
 
-## Machine Learning Components
+## Machine Learning Models
 The machine learning aspect of BOYD is central to its functionality, enabling precise fall detection and exercise tracking:
 
 ### Fall Detection: Ensemble Model
 - **Models Used**: Support Vector Machines, Decision Trees, and ensemble techniques.
 - **Performance**: Achieved a 92% overall accuracy using ensembled models.
+![Hardware Design Diagram](./image_assets/fall_detection_model.png)
 - **Features**: Processes IMU data to detect falls and minimize false positives.
 - **Deployment**: Hosted on AWS EC2 instances with Flask APIs for prediction services.
 - The following represents the ensemble model used and the its overall performance on the respective classes:
-![Hardware Design Diagram](./image_assets/fall_detection_model.png)
 
 ### Exercise Tracking: LSTM Sequence Model
 - **Models Used**: Logistic Regression, Multilayer Perceptron (MLP), and Long Short-Term Memory (LSTM).
 - **Performance**: LSTM achieved 97.95% accuracy, outperforming other models.
+![Hardware Design Diagram](./image_assets/exercise_classifier_model.png)
 - **Features**: Uses sliding window techniques to analyze movement sequences.
 - **Deployment**: Similar to the fall detection model, deployed via Docker on AWS EC2.
 - The following showcases the performance of of the Multi-Layer Perceptron compared with the performance of the LSTM.
-![Hardware Design Diagram](./image_assets/exercise_classifier_model.png)
 
 ### Data Pipeline
 - **Data Collection**: IMU sensors transmit data via Flask scripts to CSV files for preprocessing.
