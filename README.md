@@ -1,4 +1,4 @@
-# Body Observation with Yesterday’s Data (BOYD)
+# The BOYD (Body Observation with Yesterday’s Data) Project
 
 ## Overview
 BOYD is an IoT-driven healthcare monitoring system designed for elderly care. It uses two primary IoT devices: a fall detector wristband and an exercise tracker dumbbell. These devices connect to cloud services for real-time data analysis and notification, ensuring improved healthcare and monitoring for the elderly.
