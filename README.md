@@ -32,7 +32,19 @@ BOYD leverages a cloud-based architecture:
    - PWA for data visualization.
 
 ### Architecture Diagram
-![Architecture Placeholder](diagram_placeholder.png)
+![Architecture Diagram](./image_assets/architecture.png)
+
+---
+
+### Device Design
+- **Wristband**:
+  - Components: IMU sensor, WeMos microcontroller, LED, push-button, buzzer.
+  - Usage: Fall Detection
+
+- **Dumbbell**:
+  - Components: IMU sensor, WeMos microcontroller, power supply.
+  - Usage: Exercise Tracking
+![Hardware Design Diagram](./image_assets/hardware_design.png)
 
 ---
 
@@ -44,20 +56,21 @@ The machine learning aspect of BOYD is central to its functionality, enabling pr
 - **Performance**: Achieved a 92% overall accuracy using ensembled models.
 - **Features**: Processes IMU data to detect falls and minimize false positives.
 - **Deployment**: Hosted on AWS EC2 instances with Flask APIs for prediction services.
+- The following represents the ensemble model used and the its overall performance on the respective classes:
+![Hardware Design Diagram](./image_assets/fall_detection_model.png)
 
 ### Exercise Tracking: LSTM Sequence Model
 - **Models Used**: Logistic Regression, Multilayer Perceptron (MLP), and Long Short-Term Memory (LSTM).
 - **Performance**: LSTM achieved 97.95% accuracy, outperforming other models.
 - **Features**: Uses sliding window techniques to analyze movement sequences.
 - **Deployment**: Similar to the fall detection model, deployed via Docker on AWS EC2.
+- The following showcases the performance of of the Multi-Layer Perceptron compared with the performance of the LSTM.
+![Hardware Design Diagram](./image_assets/exercise_classifier_model.png)
 
 ### Data Pipeline
 - **Data Collection**: IMU sensors transmit data via Flask scripts to CSV files for preprocessing.
 - **Preprocessing**: Includes normalization and feature scaling for improved model accuracy.
 - **Inference**: Real-time predictions provided through Dockerized ML APIs.
-
-### Machine Learning Diagram
-(Include visual representation of the ML workflow here.)
 
 ---
 
@@ -110,7 +123,6 @@ Azure Functions provide serverless computing capabilities to process IoT data ef
    - Filters and forwards relevant data to appropriate storage or processing layers.
 
 2. **Event-Driven Architecture**:
-   - Automatically triggers data transformations and preprocessing tasks.
    - Integrates seamlessly with storage and machine learning workflows.
 
 3. **Scalability**:
@@ -123,14 +135,11 @@ Azure SQL Database is utilized for structured data storage and query management 
 
 1. **Data Integration**:
    - Serves as the central repository for processed data from Azure Functions.
-   - Supports seamless integration with other Azure services, such as IoT Hub and Machine Learning pipelines.
 
 2. **Structured Query Capabilities**:
    - Enables complex queries for generating detailed reports on fall detection and exercise tracking.
-   - Supports real-time analytics and insights through integrated query optimizations.
 
 3. **Scalability and Security**:
-   - Provides automated scaling to accommodate increasing data loads.
    - Ensures robust data encryption and access control through Azure Active Directory.
 
 ---
@@ -139,16 +148,14 @@ Azure SQL Database is utilized for structured data storage and query management 
 AWS EC2 provides the computational backbone for BOYD's machine learning components:
 
 1. **Model Hosting**:
-   - Hosts Dockerized machine learning models for fall detection and exercise tracking.
+   - Two Seperate EC2 instances were launched, each deploying Dockerized machine learning models for fall detection and exercise tracking respectively.
    - Ensures high availability and low-latency inference.
 
-2. **Batch Processing**:
-   - Processes bulk data for training and retraining machine learning models.
-   - Utilizes GPU-optimized instances for accelerated computations.
+2. **Model Security**:
+   - EC2 instances require key pair authentication for access, which prevents unauthorized users from accessing the instances.
+   - Since Docker containers are used to deploy models and their dependencies securely within EC2 instances, reducing the risk of configuration issues and ensuring that only authorized operations occur within these isolated environments​
+.
 
-3. **Integration with Other Services**:
-   - Integrates with AWS S3 for data storage and Lambda functions for event-driven tasks.
-   - Enables secure access using IAM roles and encryption mechanisms.
 
 ---
 
@@ -195,14 +202,10 @@ The system has been optimized for energy efficiency:
 
 ---
 
-## License
-This project is licensed under the MIT License.
-
----
-
 ## Acknowledgments
 - Developed as part of CS3237 Introduction to Internet of Things.
-- Contributions by Team 20: Marcus Ng, Marcus Tan, Mooi Suet Yeng, Neil Banerjee, and Shreyas Kumar.
+- Guidance provided by Prof. Boyd Anderson
+- Project-Team: Marcus Ng, Marcus Tan, Mooi Suet Yeng, Neil Banerjee, and Shreyas Kumar.
 
 ---
 
@@ -212,16 +215,3 @@ This project is licensed under the MIT License.
 - Python Telegram Bot: [Telegram Bot API](https://pypi.org/project/python-telegram-bot/)
 
 ---
-
-## Diagrammatic Illustrations
-### System Architecture
-(Include visual representation of the architecture here.)
-
-### Device Design
-- **Wristband**:
-  - Components: IMU sensor, WeMos microcontroller, LED, push-button, buzzer.
-  - Diagram Placeholder: ![Wristband Design](wristband_diagram_placeholder.png)
-
-- **Dumbbell**:
-  - Components: IMU sensor, WeMos microcontroller, power supply.
-  - Diagram Placeholder: ![Dumbbell Design](dumbbell_diagram_placeholder.png)
